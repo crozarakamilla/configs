@@ -199,17 +199,25 @@ bar {
 exec_always feh --bg-scale ~/Pictures/wizard.jpeg
 
 #put workspaces on specific screens
-workspace 1 output HDMI-1
-workspace 2 output eDP-1
+# workspace 1 output HDMI-1
+# workspace 2 output eDP-1
+workspace 1 output HDMI2
+workspace 2 output HDMI1
+workspace 3 output DP1
+
 
 # increase screen brightness
 bindsym XF86MonBrightnessUp exec xbacklight + 10
 bindsym XF86MonBrightnessDown exec xbacklight - 10 
 
 # volume keys
-bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 5%+
-bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 5%- 
-bindsym XF86AudioMute exec amixer -D pulse sset Master -- 0%	 
+# bindsym XF86AudioRaiseVolume exec amixer -D pulse sset Master 5%+
+# bindsym XF86AudioLowerVolume exec amixer -D pulse sset Master 5%- 
+# bindsym XF86AudioMute exec amixer -D pulse sset Master -- 0%	 
+bindsym $mod+F10 exec amixer -D pulse sset Master 5%+
+bindsym $mod+F9 exec amixer -D pulse sset Master 5%- 
+bindsym $mod+F11 exec amixer -D pulse sset Master -- 0%	 
+
 
 # keyboard layout
 exec --no-startup-id setxkbmap -layout us -variant intl
