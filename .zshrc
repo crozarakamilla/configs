@@ -87,25 +87,31 @@ export TERM='xterm-256color'
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 # source ~/.bashrc
 
+alias nvim=/opt/nvim.appimage
 alias python=python3
+alias sistran="cd ~/Projects/sistran-frontend"
+alias cootran="cd ~/Projects/cootran-backend"
+alias logstash="cd ~/Projects/logstash-transporte"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
-export LD_LIBRARY_PATH=/usr/lib/oracle/19.3/client64/lib/${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-export ORACLE_HOME=/usr/lib/oracle/19.3/client64
-export PATH=$PATH:$ORACLE_HOME/bin
+export LD_LIBRARY_PATH=/opt/oracle/instantclient_19_8:$LD_LIBRARY_PATH
+#export LD_LIBRARY_PATH=/usr/lib/oracle/19.3/client64/lib/${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+#export ORACLE_HOME=/usr/lib/oracle/19.3/client64
+#export PATH=$PATH:$ORACLE_HOME/bin
 
 export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export PROJECT_HOME=$HOME/Projects
 export VIRTUALENVWRAPPER_SCRIPT=/usr/local/bin/virtualenvwrapper.sh
 source /usr/local/bin/virtualenvwrapper_lazy.sh
-export DEV_DATABASE_URL="oracle+cx_oracle://sistrans:sistrans@tjsu690v:1521/orades"
+export DEV_DATABASE_URL="oracle+cx_oracle://sistrans:S1StranD&s&nv2020@tjsu690v:1521/orades"
+export DEV_ELASTICSEARCH_URL=https://es-transporte.apps.tjdft.jus.br
 
 export PATH=$PATH:/usr/local/go/bin
 export PATH=/opt/flutter/bin:$PATH
-export PATH=/home/kamilla/.local/bin:$PATH
+export PATH=/home/t319008/.local/bin:$PATH
 eval $(thefuck --alias)
 
 export PATH=opt/flutter/bin:$PATH
@@ -119,3 +125,8 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 # setxkbmap -model abnt2 -layout br -variant abnt2
 setxkbmap -layout us -variant intl
+fpath=($fpath "/home/t319008/.zfunctions")
+
+# Set Spaceship ZSH as a prompt
+autoload -U promptinit; promptinit
+prompt spaceship
