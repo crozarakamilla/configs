@@ -1,10 +1,6 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
-# We use preexec and precmd hook functions for Bash
-# If you have anything that's using the Debug Trap or PROMPT_COMMAND
-# change it to use preexec or precmd
-# See also https://github.com/rcaloras/bash-preexec
 
 # If not running interactively, don't do anything
 case $- in
@@ -41,7 +37,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
+    xterm|xterm-color|*-256color) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -61,11 +57,24 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    if [[ ${EUID} == 0 ]] ; then
+        PS1='${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\h\[\033[01;34m\] \W \$\[\033[00m\] '
+    else
+        PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\] \[\033[01;34m\]\w \$\[\033[00m\] '
+    fi
 else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h \w \$ '
 fi
 unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -111,70 +120,16 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# If this is an xterm set more declarative titles
-# "dir: last_cmd" and "actual_cmd" during execution
-# If you want to exclude a cmd from being printed see line 156
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\$(print_title)\a\]$PS1"
-    __el_LAST_EXECUTED_COMMAND=""
-    print_title ()
-    {
-        __el_FIRSTPART=""
-        __el_SECONDPART=""
-        if [ "$PWD" == "$HOME" ]; then
-            __el_FIRSTPART=$(gettext --domain="pantheon-files" "Home")
-        else
-            if [ "$PWD" == "/" ]; then
-                __el_FIRSTPART="/"
-            else
-                __el_FIRSTPART="${PWD##*/}"
-            fi
-        fi
-        if [[ "$__el_LAST_EXECUTED_COMMAND" == "" ]]; then
-            echo "$__el_FIRSTPART"
-            return
-        fi
-        #trim the command to the first segment and strip sudo
-        if [[ "$__el_LAST_EXECUTED_COMMAND" == sudo* ]]; then
-            __el_SECONDPART="${__el_LAST_EXECUTED_COMMAND:5}"
-            __el_SECONDPART="${__el_SECONDPART%% *}"
-        else
-            __el_SECONDPART="${__el_LAST_EXECUTED_COMMAND%% *}"
-        fi
-        printf "%s: %s" "$__el_FIRSTPART" "$__el_SECONDPART"
-    }
-    put_title()
-    {
-        __el_LAST_EXECUTED_COMMAND="${BASH_COMMAND}"
-        printf "\033]0;%s\007" "$1"
-    }
+if [ -x /usr/bin/mint-fortune ]; then
+     /usr/bin/mint-fortune
+fi
 
-    # Show the currently running command in the terminal title:
-    # http://www.davidpashley.com/articles/xterm-titles-with-bash.html
-    update_tab_command()
-    {
-        # catch blacklisted commands and nested escapes
-        case "$BASH_COMMAND" in
-            *\033]0*|update_*|echo*|printf*|clear*|cd*)
-            __el_LAST_EXECUTED_COMMAND=""
-                ;;
-            *)
-            put_title "${BASH_COMMAND}"
-            ;;
-        esac
-    }
-    preexec_functions+=(update_tab_command)
-    ;;
-*)
-    ;;
-esac
 
 export JBOSS_HOME=/opt/jboss/jboss-eap-5.1.2
 
 export PATH=$PATH:$JOSS_HOME/bin
 
-export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 
 export M2_HOME=/opt/apache-maven
 export M2=$M2_HOME/bin
@@ -185,17 +140,32 @@ export PROJECT_HOME=$HOME/Projects
 source /usr/local/bin/virtualenvwrapper.sh
 #source "/usr/local/bin/virtualenvwrapper.sh"
 
+#export P2P_ADMIN=holanda.kamilla@gmail.com
+#export MAIL_USERNAME=holanda.kamilla@gmail.com
+#export MAIL_PASSWORD=ellmxdbagwyzcgcg
 export FLASK_CONFIG=development
+export API_CONFIG=development
 export DEV_DATABASE_URL=oracle+cx_oracle://sistrans:sistrans@tjsu690v:1521/orades
 export HOM_DATABASE_URL=oracle+cx_oracle://sistrans:sistrans2017@orahom-scan:1521/orahom
+export DEV_ELASTICSEARCH_URL=https://es-transporte.apps.tjdft.jus.br/
 
 alias ll='ls -la'
-alias python=python3
 export GOPATH=$HOME/gopath
 export PATH=$GOPATH:$GOPATH/bin:$PATH
+export PATH=$PATH:/usr/local/bin
+export PATH=$PATH:/snap
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-export PATH=opt/flutter/bin:$PATH
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+# Install Ruby Gems to ~/gems
+export GEM_HOME="$HOME/gems"
+export PATH="$HOME/gems/bin:$PATH"
+# Install Ruby Gems to ~/gems
+export GEM_HOME="$HOME/gems"
+export PATH="$HOME/gems/bin:$PATH"
